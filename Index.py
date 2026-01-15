@@ -7,7 +7,7 @@ import io
 app = Flask(__name__)
 # Purana line: CORS(app)
 # Naya line aise likhein (sabse safe tarika):
-CORS(app, resources={r"/*": {"origins": "*"}}) # Yeh Blogger se request allow karne ke liye zaruri hai
+CORS(app) # Yeh Blogger se request allow karne ke liye zaruri hai
 
 @app.route('/convert', methods=['POST'])
 def convert_pdf_to_excel():
