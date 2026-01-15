@@ -1,0 +1,61 @@
+<div id="pdf-converter-tool" style="font-family: Arial, sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; text-align: center; background: #f9f9f9;">
+    <h3>PDF to Excel Converter</h3>
+    <p>Select a PDF file to convert it into Excel format.</p>
+
+    <input type="file" id="pdfFile" accept=".pdf" style="margin-bottom: 15px; width: 100%;" />
+    <br />
+    <button id="convertBtn" onclick="uploadFile()" style="background-color: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; font-size: 16px;">
+        Convert to Excel
+    </button>
+
+    <div id="status" style="margin-top: 15px; font-weight: bold; color: #555;"></div>
+</div>
+
+<script>
+async function uploadFile() {
+    const fileInput = document.getElementById('pdfFile');
+    const status = document.getElementById('status');
+    const btn = document.getElementById('convertBtn');
+
+    if (fileInput.files.length === 0) {
+        alert("Please select a PDF file first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    status.innerHTML = "Converting... Please wait.";
+    btn.disabled = true;
+
+    try {
+        // REPLACE THIS URL with your deployed Python API URL
+        const response = await fetch('https://your-python-app-url.render.com/convert', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "converted_excel.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            status.innerHTML = "Success! Your file has been downloaded.";
+            status.style.color = "green";
+        } else {
+            const errorData = await response.json();
+            status.innerHTML = "Error: " + (errorData.error || "Conversion failed.");
+            status.style.color = "red";
+        }
+    } catch (error) {
+        status.innerHTML = "Error: Could not connect to server.";
+        status.style.color = "red";
+    } finally {
+        btn.disabled = false;
+    }
+}
+</script>
